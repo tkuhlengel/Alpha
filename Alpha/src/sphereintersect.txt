@@ -1,0 +1,67 @@
+//Source: http://paulbourke.net/geometry/sphereline/
+//Line Segment defined
+//Finding the intersection closest to B/P2
+//A=P1, B=P2
+//Find the closest point to the center of the sphere, defined by:
+//Where
+
+Vertex result;
+double a,b,c, sqr, u, u1;
+bool exit, //Skip the remaining code without altering the code. Designed for return value optimization.
+	checkclose;  //Should the function check which point is closer to b?
+
+a=cmath::pow((B->getX() - A->getX()),2) + 
+	cmath::pow((B->getY() - A->getY()),2) +
+	  cmath::pow((B->getZ() - A->getZ()),2);
+b=2*((B->getX()-A->getX())(A->getX()-C->getX()) + 
+	(B->getY()-A->getY())(A->getY()-C->getY())
+	(B->getZ()-A->getZ())(A->getZ()-C->getZ());
+c=cmath::pow(C->getX(),2) + cmath::pow(C->getY(),2) +
+	cmath::pow(C->getZ(),2) + cmath::pow(A->getX(),2) +
+	cmath::pow(A->getY(),2) + cmath::pow(A->getZ(),2) -
+	2*(C->getX()*A->getX() + C->getY()*A->getY() +
+		C->getZ()*A->getZ())-this->radius*this->radius;
+
+//The sqrt component from the quadratic solution of the form a*U^2 + b*U + c;
+sqr=b*b - 4*a*c;
+
+if(0>sqr) //Then the line doesn't interesect the sphere at all
+	result=NULL;
+	exit=true;
+
+else if( 0==sqr){ // Then the line is tangent to the sphere
+	//And intersects the sphere at u=-b/2a
+	checkclose=false;
+	u=b/2a;
+	result = getMidPoint(A,B,u)
+	exit=true;
+}
+else if(0<sqr) { //Then the line intersects in 2 places
+	checkclose=true;
+	u=(-b + cmath::sqrt(sqr))/(2*a);
+	u1=(-b - cmath::sqrt(sqr))/(2*a);
+
+	Vertex t,t1;
+	t=getMidPoint(A,B,u);
+	t1=getMidPoint(A,B,u1);
+	double t_d=t.qDist(B);
+	double t1_d=t1.qDist(B);
+	if (t <= t1){
+		result=t;
+	else if (t>t1){
+		result=t1;	
+	}	
+}
+cout<<result<<endl;
+return result;
+}
+	
+Vertex Sphere::getMidPoint(Vertex *A, Vertex *B, double u){
+	double x,y,z;
+	x=A->getX() + u * (B->getX() - A->getX());
+	y=A->getY() + u * (B->getY() - A->getY());
+	Z=A->getZ() + u * (B->getZ() - A->getZ());
+	result = Vertex(x,y,z);	
+	return result;
+
+}
