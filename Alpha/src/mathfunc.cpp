@@ -553,65 +553,52 @@ double * intersect_Seg_Triangle(double * r0, double * r1, double * t0,
 	return result;
 }
 
-bool pointSegmentOverlapTest(double * pt, double * s1, double * s2) {
-	double * t1 = new double[3];
-	t1[0] = pt[0] - s1[0];
-	t1[1] = pt[1] - s1[1];
-	t1[2] = pt[2] - s1[2];
-	double * t2 = new double[3];
-	t2[0] = s2[0] - s1[0];
-	t2[1] = s2[1] - s1[1];
-	t2[2] = s2[2] - s1[2];
+bool pointSegmentOverlapTest(Alpha::Vertex * pt, Alpha::Vertex * s1, Alpha::Vertex * s2) {
+	Alpha::Vertex * t1;
+	t1 = pt->minus(s1);
+
+
+	Alpha::Vertex * t2;
+	t2 = s2->minus(s1);
 
 	bool result = false;
-	double dprod = DOT(t1, t2);
+	double dprod = DOT(t1->arry, t2->arry);
 
-	delete[] (t1);
-	delete[] (t2);
+	delete t1;
+	delete t2;
 	if (dprod > 0 && dprod < 1) {
 		result = true;
 	}
 
 	return result;
 }
-double * intersect_Triangle_Segments(double * t1, double * t2, double * t3,
-		double * s0, double * s1) {
-	double * s1p1 = new double[3];
-	s1p1[0] = t1[0];
-	s1p1[1] = t1[1];
-	s1p1[2] = t1[2];
-	double * s1p2 = new double[3];
-	s1p2[0] = t2[0];
-	s1p2[1] = t2[1];
-	s1p2[2] = t2[2];
-	double * s2p1 = new double[3];
-	s2p1[0] = t2[0];
-	s2p1[1] = t2[1];
-	s2p1[2] = t2[2];
-	double * s2p2 = new double[3];
-	s2p2[0] = t3[0];
-	s2p2[1] = t3[1];
-	s2p2[2] = t3[2];
-	double * s3p1 = new double[3];
-	s3p1[0] = t3[0];
-	s3p1[1] = t3[1];
-	s3p1[2] = t3[2];
-	double * s3p2 = new double[3];
-	s3p2[0] = t1[0];
-	s3p2[1] = t1[1];
-	s3p2[2] = t1[2];
+double * intersect_Triangle_Segments(Alpha::Vertex * t1, Alpha::Vertex * t2, Alpha::Vertex * t3,
+		Alpha::Vertex * s0, Alpha::Vertex * s1) {
 
-	double * closestPt = new double[3];
-	double * closePt = new double[3];
+	//Copy a few Vertices to make them triangle relevant
+	Alpha::Vertex * s1p1, *s1p2, *s2p1, *s2p2, *s3p1, *s3p2;
+	s1p1=Alpha::Vertex(t1);
+	s1p2=Alpha::Vertex(t2);
+
+	s2p1=Alpha::Vertex(t2);
+	s2p2=Alpha::Vertex(t3);
+
+	s3p1=Alpha::Vertex(t3);
+	s3p2=Alpha::Vertex(t1);
+
+
+	Alpha::Vertex * closestPt = new Alpha::Vertex();
+	Alpha::Vertex * closePt = new Alpha::Vertex();
+
 	double dist;
 	double minDist = HUGE_VAL;
 
-	if (vectorSize(s1p1, s1p2) > 0) { ///check for positive distance, to avoid degeneracy.
+	if (s1p1->distance(s1p2) > 0) { ///check for positive distance, to avoid degeneracy.
 		dist = dist3D_Segment_to_Segment(s1p1, s1p2, s0, s1, closePt);
 		if (dist < minDist) {
-			closestPt[0] = closePt[0];
-			closestPt[1] = closePt[1];
-			closestPt[2] = closePt[2];
+			closestPt = closePt;
+			//losestPt[1] = closePt[1];
+			//closestPt[2] = closePt[2];
 			minDist = dist;
 		}
 	}
@@ -625,7 +612,7 @@ double * intersect_Triangle_Segments(double * t1, double * t2, double * t3,
 		}
 	}
 	if (vectorSize(s3p1, s3p2) > 0) { ///check for positive distance, to avoid degeneracy.
-		dist = dist3D_Segment_to_Segment(s3p1, s3p2, s0, s1, closePt);
+		dist = dist3D_Segment_to_Segment(s3p1->arry, s3p2->arry, s0->arry, s1->arry, closePt->arry);
 		if (dist < minDist) {
 			closestPt[0] = closePt[0];
 			closestPt[1] = closePt[1];
